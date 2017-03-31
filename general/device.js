@@ -955,13 +955,6 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 						});
 					}
 				}
-				
-				//console.log('Devices found and settings ready', current_settings.data.endpoint, devices_to_poll);
-/*
-				devices_to_poll.forEach(function(device){
-					console.log(device.data);
-				});
-*/
 			}
 		}
 	});
