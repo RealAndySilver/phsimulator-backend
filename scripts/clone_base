@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Author: Andres Abril
+# © 2017, Emerson Electric Co 
+
+be_clone=$be_clone
+be_main_folder=$be_main_folder
+fe_clone=$fe_clone
+fe_main_folder=$fe_main_folder
+
+cd apps
+rm -rf $fe_main_folder
+git clone $be_clone
+cd $be_main_folder
+git checkout $be_branch
+git clone $fe_clone
+cd $fe_main_folder
+git checkout $fe_branch
+npm install
+grunt uglify
+cd ..
+mv $fe_main_folder $fe_final_folder
+rm -rf $fe_main_folder
+cd ..
+#zip -P $passphrase $be_main_folder.$type -r $be_main_folder
+7za a -tzip -p"$passphrase" -mem=AES256 "$be_main_folder.$type" "$be_main_folder"
+rm -rf $be_main_folder
+
+exit 0
