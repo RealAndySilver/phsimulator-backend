@@ -896,7 +896,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 			if(settings_res.data && settings_res.data.active){
 				current_settings = settings_res.data;
 				if(device_err){
-					console.log('No active devices found');
+					//console.log('No active devices found');
 				}
 				else{
 					if(device_res.data){
@@ -931,7 +931,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 								json : current_device
 							},function(error, response, body) {
 									if(error){
-										console.log('error posting', device.device_tag, error);
+										//console.log('error posting', device.device_tag, error);
 										return;
 									}
 									else{
@@ -944,10 +944,10 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 										
 										dbModule.updateDeviceByTag(device.device_tag, device_to_update, function(err){
 											if(err){
-												console.log('error updating', device.device_tag);
+												//console.log('error updating', device.device_tag);
 											}
 											else{
-												console.log('device updated', device.device_tag);
+												//console.log('device updated', device.device_tag);
 											}
 										});
 									}
@@ -1033,6 +1033,13 @@ function PollingDataRow(device,settings){
 			data.process_data.push(device.polling_info[key]);
 		}
 	});
+	this.data.diagnostics = {  
+		"basic_status":"0x00",
+		"extended_status":"0x00",
+		"standardized_status":"0x00",
+		"diag_data":"0x8772f1a000",
+		"diag_TS":1488224618000
+	}
 }
 
 module.exports = dbModule; 
