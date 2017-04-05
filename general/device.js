@@ -731,13 +731,10 @@ dbModule.toggleDevice = function(device_id,toggle_value,callback){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //External request
-dbModule.updateExternalDeviceByTag = function(device_tag, app, callback){
+dbModule.updateExternalDeviceByTag = function(device_tag, callback){
 	var id = 1;
 	var current_settings = {};
 	var current_device = {};
-	if(app=='pumps'){
-		id=1;
-	}
 
 	settings.getGlobalSettingsByID(id, function(err,res){
 		if(err){
@@ -783,13 +780,10 @@ dbModule.updateExternalDeviceByTag = function(device_tag, app, callback){
 };
 
 
-dbModule.createExternalDeviceByTag = function(device_tag, app, callback){
+dbModule.createExternalDeviceByTag = function(device_tag, callback){
 	var id = 1;
 	var current_settings = {};
 	var current_device = {};
-	if(app=='pumps'){
-		id=1;
-	}
 
 	settings.getGlobalSettingsByID(id, function(err,res){
 		if(err){
@@ -830,14 +824,11 @@ dbModule.createExternalDeviceByTag = function(device_tag, app, callback){
 	
 };
 
-dbModule.deleteExternalDeviceByTag = function(device_tag, app, callback){
+dbModule.deleteExternalDeviceByTag = function(device_tag, callback){
 	var id = 1;
 	var current_settings = {};
 	var current_device = {};
-	if(app=='pumps'){
-		id=1;
-	}
-	console.log('In')
+
 	settings.getGlobalSettingsByID(id, function(err,res){
 		if(err){
 			callback(err,null);

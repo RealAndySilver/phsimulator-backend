@@ -9,8 +9,8 @@
 6 silly lifecycle ap@0.0.0~prestart: no script for prestart, continuing
 7 info lifecycle ap@0.0.0~start: ap@0.0.0
 8 verbose lifecycle ap@0.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle ap@0.0.0~start: PATH: /root/.nvm/versions/node/v4.7.1/lib/node_modules/npm/bin/node-gyp-bin:/root/apps/simulator/node_modules/.bin:/root/.nvm/versions/node/v4.7.1/bin:/root/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-10 verbose lifecycle ap@0.0.0~start: CWD: /root/apps/simulator
+9 verbose lifecycle ap@0.0.0~start: PATH: /root/.nvm/versions/node/v4.7.1/lib/node_modules/npm/bin/node-gyp-bin:/root/apps/devsimulator/node_modules/.bin:/root/.nvm/versions/node/v4.7.1/bin:/root/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+10 verbose lifecycle ap@0.0.0~start: CWD: /root/apps/devsimulator
 11 silly lifecycle ap@0.0.0~start: Args: [ '-c', 'node ./bin/www' ]
 12 silly lifecycle ap@0.0.0~start: Returned: code: 1  signal: null
 13 info lifecycle ap@0.0.0~start: Failed to exec start script
@@ -25,7 +25,7 @@
 14 verbose stack     at maybeClose (internal/child_process.js:854:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:222:5)
 15 verbose pkgid ap@0.0.0
-16 verbose cwd /root/apps/simulator
+16 verbose cwd /root/apps/devsimulator
 17 error Linux 3.8.0-29-generic
 18 error argv "/root/.nvm/versions/node/v4.7.1/bin/node" "/root/.nvm/versions/node/v4.7.1/bin/npm" "start"
 19 error node v4.7.1

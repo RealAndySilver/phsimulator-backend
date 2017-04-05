@@ -109,8 +109,8 @@ router.get('/device/toggle/:device_id/:toggle_value', function(req, res, next) {
 });
 
 //UPDATE EXTERNAL DEVICE [GET]
-router.put('/device/external/:device_tag/:app', function(req, res, next) {
-	device.updateExternalDeviceByTag(req.params.device_tag, req.params.app, function(err,obj){
+router.put('/device/external/:device_tag', function(req, res, next) {
+	device.updateExternalDeviceByTag(req.params.device_tag, function(err,obj){
 		if(err){
 			res.status(err.code).send({status:false, error:err});
 			return;
@@ -120,8 +120,8 @@ router.put('/device/external/:device_tag/:app', function(req, res, next) {
 	});
 });
 //CREATE EXTERNAL DEVICE IN TARGET SERVER [GET]
-router.post('/device/external/:device_tag/:app', function(req, res, next) {
-	device.createExternalDeviceByTag(req.params.device_tag, req.params.app, function(err,obj){
+router.post('/device/external/:device_tag', function(req, res, next) {
+	device.createExternalDeviceByTag(req.params.device_tag, function(err,obj){
 		if(err){
 			res.status(err.code).send({status:false, error:err});
 			return;
@@ -131,8 +131,8 @@ router.post('/device/external/:device_tag/:app', function(req, res, next) {
 	});
 });
 //DELETE EXTERNAL DEVICE BY TAG [DELETE]
-router.delete('/device/external/:device_tag/:app', function(req, res, next) {
-	device.deleteExternalDeviceByTag(req.params.device_tag, req.params.app, function(err,obj){
+router.delete('/device/external/:device_tag', function(req, res, next) {
+	device.deleteExternalDeviceByTag(req.params.device_tag, function(err,obj){
 		if(err){
 			res.status(err.code).send({status:false, error:err});
 			return;
