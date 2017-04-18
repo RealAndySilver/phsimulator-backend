@@ -919,12 +919,11 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 								console.log('Using device settings');
 							}
 							else{
-								settings_to_use = current_settings;
+								settings_to_use = current_settings.settings;
 								console.log('Using global settings');
 							}
 							
 							current_device = new PollingDataRow(device, settings_to_use);
-							console.log('CONCAT',current_device.log.concat())
 							//return;
 							request({	
 								uri: current_settings.endpoint+'/general/private/post',
@@ -941,7 +940,6 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 									}
 									else{
 										//console.log(body);
-										console.log('Device', current_device.device_tag);
 										device.log.last_ten.unshift(current_device.log.concat());
 										device_to_update.device_tag = device.device_tag;
 										device_to_update.log = device.log;
