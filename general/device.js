@@ -876,7 +876,6 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	var devices_to_poll = [];
 	var id = 1;
 	var current_settings = {};
-	var current_device = {};
 	var now = null;
 	var device_to_update = {};
 	var time_delta = null;
@@ -897,6 +896,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 						now = +new Date();
 						devices = device_res.data;
 						devices.forEach(function(device){
+							var current_device = {};
 							if(!device.log || !device.log.last_polling_data_sent){
 								device.log = {
 									last_polling_data_sent : new Date(),
@@ -924,6 +924,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 							}
 							
 							current_device = new PollingDataRow(device, settings_to_use);
+							console.log('CONCAT',current_device.log.concat())
 							//return;
 							request({	
 								uri: current_settings.endpoint+'/general/private/post',
@@ -933,12 +934,14 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 								method: "POST",
 								json : current_device
 							},function(error, response, body) {
+
 									if(error){
 										//console.log('error posting', device.device_tag, error);
 										return;
 									}
 									else{
 										//console.log(body);
+										console.log('Device', current_device.device_tag);
 										device.log.last_ten.unshift(current_device.log.concat());
 										device_to_update.device_tag = device.device_tag;
 										device_to_update.log = device.log;
@@ -946,6 +949,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 										//console.log('Requested success',device);
 										
 										dbModule.updateDeviceByTag(device.device_tag, device_to_update, function(err){
+											current_device = null;
 											if(err){
 												//console.log('error updating', device.device_tag);
 											}
@@ -955,6 +959,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 										});
 									}
 							});
+
 						});
 					}
 				}
