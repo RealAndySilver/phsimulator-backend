@@ -584,10 +584,12 @@ dbModule.updateDeviceByID = function(id,deviceObj,callback){
 	}
 	
 	//Check if deviceObj.log exists
+/*
 	if(deviceObj.data){
 		query.push('log=:log');
 		valueObject.log = JSON.stringify(deviceObj.log);
 	}
+*/
 	
 	//Check if deviceObj.polling_info exists
 	if(deviceObj.polling_info){
@@ -878,6 +880,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	var now = null;
 	var device_to_update = {};
 	var time_delta = null;
+	var settings_to_use = null;
 	settings.getGlobalSettingsByID(id, function(settings_err,settings_res){
 		if(settings_err){
 			console.log('Error loading settings. Can not send request to target server.');
@@ -885,7 +888,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 		}
 		else{
 			if(settings_res.data && settings_res.data.active){
-				current_settings = settings_res.data;
+				current_settings = settings_res.data.data;
 				if(device_err){
 					//console.log('No active devices found');
 				}
@@ -894,16 +897,16 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 						now = +new Date();
 						devices = device_res.data;
 						devices.forEach(function(device){
-							if(!device.log.last_polling_data_sent){
+							if(!device.log || !device.log.last_polling_data_sent){
 								device.log = {
-									last_polling_data_sent : now,
+									last_polling_data_sent : new Date(),
 									last_ten : []
 								};
 							}
 							else{
 								time_delta = ((now - device.log.last_polling_data_sent)/1000);
 								if( time_delta < device.update_rate){
-									console.log('Not yet', device.device_tag, 'Update rate:', device.update_rate, 'Time elapsed:', time_delta);
+									//console.log('Not yet', device.device_tag, 'Update rate:', device.update_rate, 'Time elapsed:', time_delta);
 									return;
 								}
 								else{
@@ -911,10 +914,19 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 									device.log.last_polling_data_sent = now;
 								}
 							}
-							current_device = new PollingDataRow(device, current_settings);
+							if(device.data.override_global_settings){
+								settings_to_use = device.data.settings;
+								console.log('Using device settings');
+							}
+							else{
+								settings_to_use = current_settings;
+								console.log('Using global settings');
+							}
+							
+							current_device = new PollingDataRow(device, settings_to_use);
 							//return;
 							request({	
-								uri: current_settings.data.endpoint+'/general/private/post',
+								uri: current_settings.endpoint+'/general/private/post',
 								headers: {
 									'content-type': 'application/json'
 								},
@@ -927,10 +939,10 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 									}
 									else{
 										//console.log(body);
-										device.log.last_ten.push(current_device.log.join('\t'));
+										device.log.last_ten.unshift(current_device.log.concat());
 										device_to_update.device_tag = device.device_tag;
 										device_to_update.log = device.log;
-										device_to_update.log.last_ten.splice(10,device_to_update.log.last_ten.length);
+										device_to_update.log.last_ten.splice(100,device_to_update.log.last_ten.length);
 										//console.log('Requested success',device);
 										
 										dbModule.updateDeviceByTag(device.device_tag, device_to_update, function(err){
@@ -954,6 +966,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 },3000);
 
 function PollingDataRow(device,settings){
+	var algorithm = '';
 	this.date = +new Date();
 	this.device_tag = device.device_tag;
 	this.device_address = device.device_address || 'NA';
@@ -972,40 +985,88 @@ function PollingDataRow(device,settings){
 		if(device.polling_info[key] && device.polling_info[key].active){
 			device.polling_info[key].dv_TS = +new Date();
 			device.polling_info[key].dv_value_description = device.polling_info[key].dv_value;
+			
+			//Pumps
 			if(device.polling_info[key].dv_value=='Vibration 1'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.OV1_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.OV1_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*OV1_SS)+(CONST*Math.random())+0.1';
 			}else if(device.polling_info[key].dv_value=='Peakvue 1'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.PKV1_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.PKV1_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*PKV1_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Vibration 2'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.OV2_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.OV2_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*OV2_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Peakvue 2'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.PKV2_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.PKV2_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*PKV2_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Discharge P'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.DISCH_P_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.DISCH_P_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*DISCH_P_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Flow'){
-				device.polling_info[key].dv_value = ((settings.data.SPEED_SP/settings.data.SPEED_MAX)*settings.data.FLOW_SS)+(0.05*Math.random())+0.1;
+				device.polling_info[key].dv_value = ((settings.SPEED_SP/settings.SPEED_MAX)*settings.FLOW_SS)+(settings.CONST*Math.random())+0.1;
+				algorithm = '((SPEED_SP/SPEED_MAX)*FLOW_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Suction P'){
-				device.polling_info[key].dv_value = settings.data.SUCT_P_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.SUCT_P_SS + (settings.CONST*Math.random());
+				algorithm = '(SUCT_P_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Strainer dP'){
-				device.polling_info[key].dv_value = settings.data.STR_DP_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.STR_DP_SS + (settings.CONST*Math.random());
+				algorithm = '(STR_DP_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Seal Level'){
-				device.polling_info[key].dv_value = settings.data.SEAL_L_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.SEAL_L_SS + (settings.CONST*Math.random());
+				algorithm = '(SEAL_L_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Seal Pressure'){
-				device.polling_info[key].dv_value = settings.data.SEAL_P_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.SEAL_P_SS + (settings.CONST*Math.random());
+				algorithm = '(SEAL_P_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Bear Temp 1'){
-				device.polling_info[key].dv_value = settings.data.BEAR1_T_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.BEAR1_T_SS + (settings.CONST*Math.random());
+				algorithm = '(BEAR1_T_SS)+(CONST*Math.random())+0.1';
 			}
 			else if(device.polling_info[key].dv_value=='Bear Temp 2'){
-				device.polling_info[key].dv_value = settings.data.BEAR2_T_SS + (0.05*Math.random());
+				device.polling_info[key].dv_value = settings.BEAR2_T_SS + (settings.CONST*Math.random());
+				algorithm = '(BEAR2_T_SS)+(CONST*Math.random())+0.1';
+			}
+			
+			//Heatexchanger
+			else if(device.polling_info[key].dv_value=='Hot Side Flow'){
+				device.polling_info[key].dv_value = settings.FLOW_H_SS + (settings.CONST*Math.random());
+				algorithm = '(FLOW_H_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Hot Side Inlet Temp'){
+				device.polling_info[key].dv_value = settings.TEMP_H_I_SS + (settings.CONST*Math.random());
+				algorithm = '(TEMP_H_I_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Hot Side Outlet Temp'){
+				device.polling_info[key].dv_value = settings.TEMP_H_O_SS + (settings.CONST*Math.random());
+				algorithm = '(TEMP_H_O_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Hot Side Pressure'){
+				device.polling_info[key].dv_value = settings.DP_H_SS + (settings.CONST*Math.random());
+				algorithm = '(DP_H_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Cold Side Fow'){
+				device.polling_info[key].dv_value = settings.FLOW_C_SS + (settings.CONST*Math.random());
+				algorithm = '(FLOW_C_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Cold Side Inlet Temp'){
+				device.polling_info[key].dv_value = settings.TEMP_C_I_SS + (settings.CONST*Math.random());
+				algorithm = '(TEMP_C_I_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Cold Side Outlet Temp'){
+				device.polling_info[key].dv_value = settings.TEMP_C_O_SS + (settings.CONST*Math.random());
+				algorithm = '(TEMP_C_O_SS)+(CONST*Math.random())+0.1';
+			}
+			else if(device.polling_info[key].dv_value=='Cold Side Pressure'){
+				device.polling_info[key].dv_value = settings.DP_C_SS + (settings.CONST*Math.random());
+				algorithm = '(DP_C_SS)+(CONST*Math.random())+0.1';
 			}
 			
 			log_object.variable = key;
@@ -1014,11 +1075,11 @@ function PollingDataRow(device,settings){
 			
 			log_string = 	key + ' ' + 
 							device.polling_info[key].dv_value_description + ' ' + 
-							' Status:' + device.polling_info[key].dv_status + 
-							' Value:' + device.polling_info[key].dv_value + ' ' + 
-							' Date:' + new Date();
-			
-			self.log.push(log_string);
+							' Status: ' + device.polling_info[key].dv_status + 
+							' Value: ' + device.polling_info[key].dv_value + ' ' + 
+							' Date: ' + new Date() ;
+
+			self.log.push({value:log_string, algorithm: algorithm});
 			//device.polling_info[key].dv_value = 'My new calculated value for '+key;
 			delete device.polling_info[key].active;
 			data.process_data.push(device.polling_info[key]);

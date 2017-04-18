@@ -11,11 +11,16 @@
 var express = require('express');
 var router = express.Router();
 var device = require('./general/device');
+var list = require('./general/list');
 var settings = require('./general/settings');
 /////////////////////////////
 /// End of Dependencies /////
 /////////////////////////////
-
+//GET LISTS [GET]
+router.get('/list', function(req, res, next) {
+	res.json({status:true, data:list});
+	return;
+});
 //CREATE DEVICE [POST]
 router.post('/device', function(req, res, next) {
 	device.createNewDevice(req.body, function(err,obj){
