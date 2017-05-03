@@ -1,6 +1,6 @@
 var list = function(){
 	return {
-		apps : ['Pumps', 'HeatExchanger'],
+		apps : ['Pumps', 'HeatExchanger', 'WirelessPressureGauge'],
 		device_types : ['Pressure','Flow','Temp','Vibration','HE-Flow', "HE-Pressure", "HE-Temp"],
 		device_sub_types : {
 			Pressure : [9817,9828,9836,9841,9845],
@@ -125,10 +125,10 @@ var list = function(){
 				"gal/day",      //galones por dia
 			],
 			Temp : [
-				"degC", //Grados centigrados
-				"degF", //Grados faranheit
-				"degR", //Grados Racon
-				"degK", //Grados Kelvin
+				"DegC", //Grados centigrados
+				"DegF", //Grados faranheit
+				"DegR", //Grados Racon
+				"DegK", //Grados Kelvin
 			],
 			Vibration : [
 				"in/sec", //pulgadas por segundo
@@ -141,7 +141,7 @@ var list = function(){
 			Seallevel : [
 				"%"       //porcentaje
 			],
-			"HE-Flow" : [
+			"HE-Flow2" : [
 				"ft^3/min",    //pies cubicos por minuto
 				"gal/min",     //galones por minuto
 				"l/min",        //litros por minuto
@@ -202,10 +202,66 @@ var list = function(){
 				"mmWc",       //Millimeters water column
 			],
 			"HE-Temp" : [
-				"degC", //Grados centigrados
-				"degF", //Grados faranheit
-				"degR", //Grados Racon
-				"degK", //Grados Kelvin
+				"DegC", //Grados centigrados
+				"DegF", //Grados faranheit
+				"DegR", //Grados Racon
+				"DegK", //Grados Kelvin
+			],
+			"HE-Flow" : [
+				"ug/s",
+				"mg/s",
+				"g/s",
+				"ounces/s",
+				"lbs/s",
+				"kg/s",
+				"st/s",
+				"cwtusa/s",
+				"cwtuk/s",
+				"short tons/s",
+				"metric tons/s",
+				"long tons/s",
+				"kshort tons/s",
+				"kmetric tons/s",
+				"klong tons/s",
+				"Mshort tons/s",
+				"Mmetric tons/s",
+				"Mlong tons/s",
+				"ug/day",
+				"mg/day",
+				"g/day",
+				"ounces/day",
+				"lbs/day",
+				"kg/day",
+				"st/day",
+				"cwtusa/day",
+				"cwtuk/day",
+				"short tons/day",
+				"metric tons/day",
+				"long tons/day",
+				"kshort tons/day",
+				"kmetric tons/day",
+				"klong tons/day",
+				"Mshort tons/day",
+				"Mmetric tons/day",
+				"Mlong tons/day",
+				"ug/hr",
+				"mg/hr",
+				"g/hr",
+				"ounces/hr",
+				"lbs/hr",
+				"kg/hr",
+				"st/hr",
+				"cwtusa/hr",
+				"cwtuk/hr",
+				"short tons/hr",
+				"metric tons/hr",
+				"long tons/hr",
+				"kshort tons/hr",
+				"kmetric tons/hr",
+				"klong tons/hr",
+				"Mshort tons/hr",
+				"Mmetric tons/hr",
+				"Mlong tons/hr",
 			],
 			
 		}

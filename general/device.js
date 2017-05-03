@@ -966,7 +966,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	});
 	
 });
-},3000);
+},10000);
 
 function PollingDataRow(device,settings){
 	var algorithm = '';
@@ -975,7 +975,9 @@ function PollingDataRow(device,settings){
 	this.device_address = device.device_address || 'NA';
 	this.server_type = 'HART-IP';
 	this.server_src = 'Simulator';
-	this.variable = device.var_list.split(',').length > 1 ? 'MULTI':device.var_list;
+	//this.variable = device.var_list.split(',').length > 1 ? 'MULTI':device.var_list;
+	this.variable = device.var_list.split(',').length > 0 ? device.var_list:'';
+	console.log('Var',this.variable);
 	this.data = {
 		process_data : []
 	};
