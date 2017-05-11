@@ -15,6 +15,8 @@ var dblite = require("dblite");
 var dataHelper = require('./datahelper');
 var settings = require('./settings');
 var request = require("request");
+var crypto = require("crypto");
+var security =  require('./security');
 //////////////////////////
 ///End of Dependencies ///
 //////////////////////////
@@ -880,6 +882,17 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	var device_to_update = {};
 	var time_delta = null;
 	var settings_to_use = null;
+	var public_key ='lop+2dzuioa/000mojijiaop';
+	var public_key64 = security.base64('lop+2dzuioa/000mojijiaop');
+	var date = Math.ceil((new Date).getTime()/1000);
+	var sstm = security.base64(date.toString());
+	var token = public_key + date.toString();
+	var sha256 = crypto.createHash("sha256");
+	var result = '';
+	
+	sha256.update(token,"utf8");
+	token = sha256.digest("hex");
+	
 	settings.getGlobalSettingsByID(id, function(settings_err,settings_res){
 		if(settings_err){
 			console.log('Error loading settings. Can not send request to target server.');
@@ -905,22 +918,24 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 							}
 							else{
 								time_delta = ((now - device.log.last_polling_data_sent)/1000);
+/*
 								if( time_delta < device.update_rate){
 									//console.log('Not yet', device.device_tag, 'Update rate:', device.update_rate, 'Time elapsed:', time_delta);
 									return;
 								}
 								else{
-									console.log('Time to post', device.device_tag, 'Update rate:', device.update_rate, 'Time elapsed:', time_delta);
+*/
+									//console.log('Time to post', device.device_tag, 'Update rate:', device.update_rate, 'Time elapsed:', time_delta);
 									device.log.last_polling_data_sent = now;
-								}
+								//}
 							}
 							if(device.data.override_global_settings){
 								settings_to_use = device.data.settings;
-								console.log('Using device settings');
+								//console.log('Using device settings');
 							}
 							else{
 								settings_to_use = current_settings.settings;
-								console.log('Using global settings');
+								//console.log('Using global settings');
 							}
 							
 							current_device = new PollingDataRow(device, settings_to_use);
@@ -928,7 +943,10 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 							request({	
 								uri: current_settings.endpoint+'/general/private/post',
 								headers: {
-									'content-type': 'application/json'
+									'content-type': 'application/json',
+									'sstm': sstm,
+									'public_key' : public_key64,
+									'token' : token
 								},
 								method: "POST",
 								json : current_device
@@ -966,7 +984,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	});
 	
 });
-},10000);
+},100);
 
 function PollingDataRow(device,settings){
 	var algorithm = '';
@@ -975,9 +993,7 @@ function PollingDataRow(device,settings){
 	this.device_address = device.device_address || 'NA';
 	this.server_type = 'HART-IP';
 	this.server_src = 'Simulator';
-	//this.variable = device.var_list.split(',').length > 1 ? 'MULTI':device.var_list;
 	this.variable = device.var_list.split(',').length > 0 ? device.var_list:'';
-	console.log('Var',this.variable);
 	this.data = {
 		process_data : []
 	};
