@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/api', api);
 app.use(express.static(path.join(__dirname, 'frontend')));
-process.env.PORT = 3200;
+process.env.PORT = 3100;
 
 Object.keys(ifaces).forEach(function (ifname) {
   var alias = 0;

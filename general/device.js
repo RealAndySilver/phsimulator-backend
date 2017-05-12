@@ -984,7 +984,7 @@ dbModule.getActiveDevicesList('ASC', 10000, function(device_err,device_res){
 	});
 	
 });
-},100);
+},10000);
 
 function PollingDataRow(device,settings){
 	var algorithm = '';

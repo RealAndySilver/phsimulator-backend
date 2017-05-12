@@ -170,6 +170,7 @@ var list = function(){
 				"IG/s",         //
 				"l/hr",         //litros por hora
 				"gal/day",      //galones por dia
+				"%",
 			],
 			"HE-Pressure" : [
 				"InH2O 68F",  //PU_inH2OAt68F:  2.4864110E+02, //Inch of water at 68F                  
